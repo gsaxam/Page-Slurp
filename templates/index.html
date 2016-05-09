@@ -1,0 +1,81 @@
+<html>
+<head>
+    <script src="static/node_modules/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script src="static/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        body {
+            background: #303030;
+        }
+
+        .container {
+            color: #ff0564;
+        }
+
+        .vertical-space {
+            margin-top: 3%;
+        }
+
+        .horizontal-space {
+            margin-left: 1%;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1> Page Slurp</h1>
+    <div class="vertical-space"></div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="col-lg-11">
+                <div class="input-group">
+                    <span class="input-group-addon">URL</span>
+                    <input id="page-url-input" type="text" class="form-control"
+                           placeholder="Please type in a page URL"/>
+                </div>
+            </div>
+            <input id="page-url-submit" type="button" class="btn btn-success" value="slurp"
+                   onclick="processInputUrl()"/>
+            <span class="horizontal-space" id="loading-gif" style="visibility: hidden">
+                <img src="static/images/loading.gif" width="20px" height="20px" />
+            </span>
+        </div>
+        <div class="panel-body" id="result-body"></div>
+    </div>
+</div>
+</div>
+
+<script type="application/javascript">
+
+    function readListIntoItems(list) {
+        console.log(list)
+        resultList = list
+        console.log(resultList)
+
+        var resultString = ''
+        for (var i = 0; i < resultList.length; i++) {
+            resultString += "<li>" + resultList[i] + "</li>"
+        }
+
+        return resultString
+    }
+
+    function processInputUrl() {
+        document.getElementById("loading-gif").style.visibility = 'visible'
+        $.ajax({
+            type: 'POST',
+            url: "/inputUrl",
+            data: JSON.stringify({"url": document.getElementById("page-url-input").value}),
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (resultData) {
+                document.getElementById("loading-gif").style.visibility = 'hidden'
+                $("#result-body").show()
+                $("#result-body").html(readListIntoItems(resultData.result))
+            }
+        });
+    }
+</script>
+</body>
+</html>
