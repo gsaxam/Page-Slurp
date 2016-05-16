@@ -6,19 +6,19 @@
 
     <style type="text/css">
         body {
-            background: #303030;
+        background: #303030;
         }
 
         .container {
-            color: #ff0564;
+        color: #ff0564;
         }
 
         .vertical-space {
-            margin-top: 3%;
+        margin-top: 3%;
         }
 
         .horizontal-space {
-            margin-left: 1%;
+        margin-left: 1%;
         }
     </style>
 </head>
@@ -38,7 +38,7 @@
             <input id="page-url-submit" type="button" class="btn btn-success" value="slurp"
                    onclick="processInputUrl()"/>
             <span class="horizontal-space" id="loading-gif" style="visibility: hidden">
-                <img src="static/images/loading.gif" width="20px" height="20px" />
+                <img src="static/images/loading.gif" width="20px" height="20px"/>
             </span>
         </div>
         <div class="panel-body" id="result-body"></div>
@@ -48,14 +48,16 @@
 
 <script type="application/javascript">
 
-    function readListIntoItems(list) {
-        console.log(list)
-        resultList = list
-        console.log(resultList)
-
+    function readListIntoItems(resultDict) {
+        var linkPrefix = document.getElementById("page-url-input").value
         var resultString = ''
-        for (var i = 0; i < resultList.length; i++) {
-            resultString += "<li>" + resultList[i] + "</li>"
+        var resultDict = resultDict
+        for (header in resultDict) {
+            if (resultDict[header].startsWith("http:")){
+                resultString += "<li><a href='"+ resultDict[header] +"'>" + header + "</a></li>"
+            } else {
+                resultString += "<li><a href='"+ linkPrefix + resultDict[header] +"'>" + header + "</a></li>"
+            }
         }
 
         return resultString
@@ -72,10 +74,12 @@
             success: function (resultData) {
                 document.getElementById("loading-gif").style.visibility = 'hidden'
                 $("#result-body").show()
-                $("#result-body").html(readListIntoItems(resultData.result))
+                console.log(resultData)
+                $("#result-body").html(readListIntoItems(resultData))
             }
         });
     }
+
 </script>
 </body>
 </html>

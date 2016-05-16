@@ -23,9 +23,8 @@ def home():
 def process_input_url():
     page_url = request.get_json()
     result = slurp_page(page_url['url'])
-    response = {"result": result}
-    print(response)
-    return json.dumps(response), httplib.OK
+    print result
+    return json.dumps(result), httplib.OK
 
 
 if __name__ == '__main__':
