@@ -10,10 +10,15 @@ from bs4 import BeautifulSoup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+http_prefix = "http://"
+
 
 def slurp_page(url):
     try:
-        r = requests.get(url)
+        if http_prefix in url:
+            r = requests.get(url)
+        else:
+            r = requests.get(http_prefix + url)
         soup = BeautifulSoup(r.text)
 
         header_data = {}
@@ -27,5 +32,24 @@ def slurp_page(url):
 
     except Exception as e:
         logger.error("Cannot open url=%s because of error=%s" % (str(url), str(e)))
-    print header_data
     return header_data
+
+
+# def get_images(url):
+#     for link in re.findall('http://sports.cbsimg.net/images/nba/logos/30x30/[A-Z]*.png', source):
+#         print link
+#
+#     try:
+#         if http_prefix in url:
+#             r = requests.get(url)
+#         else:
+#             r = requests.get(http_prefix + url)
+#         soup = BeautifulSoup(r.text)
+#
+#         header_data = {}
+#
+#         for link in soup.findall('http://sports.cbsimg.net/images/nba/logos/30x30/[A-Z]*.png', source):
+#             print link
+#
+#     except Exception as e:
+#         logger.error("Cannot open url=%s because of error=%s" % (str(url), str(e)))
