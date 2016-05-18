@@ -28,7 +28,7 @@
 </head>
 <body>
 <div class="container">
-    <h1> Page Slurp</h1>
+    <h1><img src="static/images/page_slurp.png"/></h1>
     <div class="vertical-space"></div>
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -49,11 +49,11 @@
             <div id="exTab2">
                 <ul class="nav nav-tabs">
                     <li class="active">
-                        <a href="#1" data-toggle="tab">Headers</a>
+                        <a href="#headers-ph" data-toggle="tab">Headers</a>
                     </li>
-                    <li><a href="#2" data-toggle="tab">Images</a>
+                    <li><a href="#images-ph" data-toggle="tab">Images</a>
                     </li>
-                    <li><a href="#3" data-toggle="tab">JS</a>
+                    <li><a href="#js-ph" data-toggle="tab">JS</a>
                     </li>
                 </ul>
 
@@ -78,6 +78,8 @@
 
 
 <script type="application/javascript">
+    var httpPrefix = "http://"
+    var httpsPrefix = "https://"
 
     $(document).keypress(function (e) {
         if (e.which == 13) {
@@ -87,18 +89,40 @@
     });
 
     function readListIntoItems(resultDict) {
-        var linkPrefix = document.getElementById("page-url-input").value
         var resultString = ''
-        var resultDict = resultDict
         for (header in resultDict) {
-            if (resultDict[header].startsWith("http:")) {
+            if ((resultDict[header].indexOf(httpPrefix) > -1) || (resultDict[header].indexOf(httpsPrefix) > -1)) {
                 resultString += "<li><a href='" + resultDict[header] + "'>" + header + "</a></li>"
             } else {
-                resultString += "<li><a href='" + linkPrefix + resultDict[header] + "'>" + header + "</a></li>"
+                resultString += "<li><a href='" + prefixHttp(getLinkPrefix()) + resultDict[header] + "'>" + header + "</a></li>"
             }
         }
 
         return resultString
+    }
+
+    function renderImageLinks(imageList) {
+        var resultString = ''
+        for (image in imageList) {
+            if ((imageList[image].indexOf(httpPrefix) > -1) || (imageList[image].indexOf(httpsPrefix) > -1)) {
+                resultString += "<img src='" + imageList[image] + "'/>"
+            } else {
+                resultString += "<img src='" + prefixHttp(getLinkPrefix()) + imageList[image] + "'/>"
+            }
+        }
+        console.log(resultString)
+        return resultString
+    }
+
+    function prefixHttp(url) {
+        if ((url.indexOf(httpPrefix) === -1) || (url.indexOf(httpsPrefix) === -1)) {
+            var new_url = httpPrefix + url
+        }
+        return new_url
+    }
+
+    function getLinkPrefix() {
+        return document.getElementById("page-url-input").value
     }
 
     function processInputUrl() {
@@ -106,14 +130,15 @@
         $.ajax({
             type: 'POST',
             url: "/inputUrl",
-            data: JSON.stringify({"url": document.getElementById("page-url-input").value}),
+            data: JSON.stringify({"url": prefixHttp(document.getElementById("page-url-input").value)}),
             dataType: "json",
             contentType: "application/json; charset=utf-8",
-            success: function (resultData) {
+            success: function (result) {
                 document.getElementById("loading-gif").style.visibility = 'hidden'
                 $("#result-body").show()
-                console.log(resultData)
-                $("#headers-ph").html(readListIntoItems(resultData))
+                console.log(result)
+                $("#headers-ph").html(readListIntoItems(result.header_data))
+                $("#images-ph").html(renderImageLinks(result.images))
             }
         });
     }

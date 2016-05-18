@@ -22,6 +22,7 @@ def slurp_page(url):
         soup = BeautifulSoup(r.text)
 
         header_data = {}
+        slurped_data = {}
         for h_count in range(1, 4):
             if soup.find_all('h' + str(h_count)):
                 for header in soup.find_all('h' + str(h_count)):
@@ -29,27 +30,17 @@ def slurp_page(url):
                         header_data[header.get_text()] = header.a["href"]
                     except Exception as e:
                         header_data[header.get_text()] = "#"
-
+        # collect all image data
+        image_data = get_images(soup)
+        # set image_data to 'images' key into header_data
+        slurped_data['images'] = image_data
+        slurped_data['header_data'] = header_data
+        # print(hea)
     except Exception as e:
         logger.error("Cannot open url=%s because of error=%s" % (str(url), str(e)))
-    return header_data
+    return slurped_data
 
 
-# def get_images(url):
-#     for link in re.findall('http://sports.cbsimg.net/images/nba/logos/30x30/[A-Z]*.png', source):
-#         print link
-#
-#     try:
-#         if http_prefix in url:
-#             r = requests.get(url)
-#         else:
-#             r = requests.get(http_prefix + url)
-#         soup = BeautifulSoup(r.text)
-#
-#         header_data = {}
-#
-#         for link in soup.findall('http://sports.cbsimg.net/images/nba/logos/30x30/[A-Z]*.png', source):
-#             print link
-#
-#     except Exception as e:
-#         logger.error("Cannot open url=%s because of error=%s" % (str(url), str(e)))
+def get_images(soup):
+    img_list = [x['src'] for x in soup.findAll('img')]
+    return img_list
